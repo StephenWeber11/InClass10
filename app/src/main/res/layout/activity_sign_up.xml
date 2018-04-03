@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SignUp">
+
+    <EditText
+        android:id="@+id/FirstName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/SignupEmail"
+        android:layout_alignParentTop="true"
+        android:layout_alignStart="@+id/LastName"
+        android:layout_marginTop="36dp"
+        android:ems="10"
+        android:hint="First name"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/LastName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignEnd="@+id/SignupPassword"
+        android:layout_alignStart="@+id/SignupEmail"
+        android:layout_alignTop="@+id/FirstName"
+        android:layout_marginTop="45dp"
+        android:ems="10"
+        android:hint="Last Name"
+        android:inputType="textPersonName" />
+
+    <EditText
+        android:id="@+id/SignupEmail"
+        android:layout_width="297dp"
+        android:layout_height="43dp"
+        android:layout_below="@+id/LastName"
+        android:layout_centerHorizontal="true"
+        android:ems="10"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        tools:layout_editor_absoluteX="44dp"
+        tools:layout_editor_absoluteY="223dp" />
+
+    <EditText
+        android:id="@+id/SignupPassword"
+        android:layout_width="298dp"
+        android:layout_height="44dp"
+        android:layout_alignStart="@+id/SignupEmail"
+        android:layout_below="@+id/SignupEmail"
+        android:ems="10"
+        android:hint="Choose Password"
+        android:inputType="textPassword"
+        tools:layout_editor_absoluteX="44dp"
+        tools:layout_editor_absoluteY="356dp" />
+
+    <EditText
+        android:id="@+id/SignupRePassword"
+        android:layout_width="297dp"
+        android:layout_height="44dp"
+        android:layout_alignEnd="@+id/SignupPassword"
+        android:layout_below="@+id/SignupPassword"
+        android:ems="10"
+        android:hint="Repeat Password"
+        android:inputType="textPassword"
+        tools:layout_editor_absoluteX="44dp"
+        tools:layout_editor_absoluteY="286dp" />
+
+    <Button
+        android:id="@+id/CancelButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignStart="@+id/SignupPassword"
+        android:layout_below="@+id/SignupPassword"
+        android:layout_marginTop="56dp"
+        android:text="Cancel" />
+
+    <Button
+        android:id="@+id/SignupButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/CancelButton"
+        android:layout_alignEnd="@+id/SignupRePassword"
+        android:text="Sign Up" />
+
+</RelativeLayout>
