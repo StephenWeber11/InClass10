@@ -97,29 +97,35 @@ public class ChatHttpService {
 
     protected void getThreadList(String token) {
 
-        RequestBody formBody = new FormBody.Builder()
-                .add("email", token)
-                .build();
+        if (getTokenFromSharedPreferences().equals(token)) {
 
-        final Request request = new Request.Builder()
-                .addHeader("Authorization","BEARER " + token)
-                .url("http://ec2-54-91-96-147.compute-1.amazonaws.com/api/thread")
-                .build();
+            final Request request = new Request.Builder()
+                        .addHeader("Authorization", "BEARER " + token)
+                        .url("http://ec2-54-91-96-147.compute-1.amazonaws.com/api/thread")
+                        .build();
 
-        client.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-                Log.d("Http", "Call Failed!");
-                e.printStackTrace();
-            }
+            client.newCall(request).enqueue(new Callback() {
+                @Override
+                public void onFailure(Call call, IOException e) {
+                    Log.d("Http", "Call Failed!");
+                    e.printStackTrace();
+                }
 
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responseBody = response.body().string();
-                Log.d("Http", "Response: " + responseBody);
-                parseThreadList(responseBody);
-            }
-        });
+                @Override
+                public void onResponse(Call call, Response response) throws IOException {
+                    String responseBody = response.body().string();
+                    Log.d("Http", "Response: " + responseBody);
+                    parseThreadList(responseBody);
+                }
+            });
+        }  else {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(activity, "Authentication Issue. Please Login Again.", Toast.LENGTH_SHORT).show();;
+                }
+            });
+        }
     }
 
     protected void parseUserForLogin(String json){
@@ -128,7 +134,7 @@ public class ChatHttpService {
 
         if(!tokenResponse.getStatus().equals("error")){
             getThreadList(tokenResponse.getToken());
-//            saveToken(tokenResponse.getToken());
+            saveToken(tokenResponse.getToken());
 
         } else {
             activity.runOnUiThread(new Runnable() {
@@ -183,7 +189,7 @@ public class ChatHttpService {
             }
         });
 
-        Log.d("Http","ThreadList size: " + threadList.getThreads().size());
+        Log.d("Http", "ThreadList size: " + threadList.getThreads().size());
     }
 
     protected void saveToken(String token) {
@@ -191,6 +197,13 @@ public class ChatHttpService {
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.putString(activity.getString(R.string.preference_file_key), token);
         editor.commit();
+    }
+
+    protected String getTokenFromSharedPreferences() {
+        SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String token = sharedPref.getString(activity.getString(R.string.preference_file_key), null);
+
+        return token;
     }
 
 }
