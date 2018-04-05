@@ -97,7 +97,7 @@ public class ChatHttpService {
 
     protected void getThreadList(String token) {
 
-        if (getTokenFromSharedPreferences().equals(token)) {
+        if (tokenIsAuthenticated(token)) {
 
             final Request request = new Request.Builder()
                         .addHeader("Authorization", "BEARER " + token)
@@ -133,8 +133,8 @@ public class ChatHttpService {
         tokenResponse = gson.fromJson(json, TokenResponse.class);
 
         if(!tokenResponse.getStatus().equals("error")){
-            getThreadList(tokenResponse.getToken());
             saveToken(tokenResponse.getToken());
+            getThreadList(tokenResponse.getToken());
 
         } else {
             activity.runOnUiThread(new Runnable() {
@@ -152,8 +152,8 @@ public class ChatHttpService {
         tokenResponse = gson.fromJson(json, TokenResponse.class);
 
         if(!tokenResponse.getStatus().equals("error")){
-            getThreadList(tokenResponse.getToken());
             saveToken(tokenResponse.getToken());
+            getThreadList(tokenResponse.getToken());
 
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -199,11 +199,12 @@ public class ChatHttpService {
         editor.commit();
     }
 
-    protected String getTokenFromSharedPreferences() {
+    protected boolean tokenIsAuthenticated(String token) {
         SharedPreferences sharedPref = activity.getSharedPreferences(activity.getString(R.string.preference_file_key), Context.MODE_PRIVATE);
-        String token = sharedPref.getString(activity.getString(R.string.preference_file_key), null);
+        String savedToken = sharedPref.getString(activity.getString(R.string.preference_file_key), null);
 
-        return token;
+        return token.equals(savedToken);
+
     }
 
 }
