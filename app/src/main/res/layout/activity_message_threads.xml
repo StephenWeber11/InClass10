@@ -10,13 +10,17 @@
         android:id="@+id/UsernameMessage"
         android:layout_width="wrap_content"
         android:layout_height="50dp"
-        android:layout_alignParentEnd="true"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
-        android:text="UserName" />
+        android:layout_marginStart="19dp"
+        android:layout_marginTop="14dp"
+        android:text="UserName"
+        android:textAlignment="textStart"
+        android:textAppearance="@style/TextAppearance.AppCompat.Body1"
+        android:textSize="18sp" />
 
     <ImageButton
-        android:id="@+id/imageButton"
+        android:id="@+id/logoutButton"
         android:layout_width="50dp"
         android:layout_height="50dp"
         android:layout_alignParentEnd="true"
@@ -25,13 +29,19 @@
         app:srcCompat="@mipmap/ic_launcher_logout" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/currentThreadsHeading"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentStart="true"
+        android:layout_alignStart="@+id/UsernameMessage"
         android:layout_below="@+id/UsernameMessage"
         android:text="Current Threads"
         android:textColor="@android:color/black"
         android:textSize="18sp" />
+
+    <ListView
+        android:id="@+id/threadListView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_alignStart="@+id/currentThreadsHeading"
+        android:layout_below="@+id/currentThreadsHeading" />
 </RelativeLayout>

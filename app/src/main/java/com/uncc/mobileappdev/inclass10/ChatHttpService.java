@@ -2,14 +2,15 @@ package com.uncc.mobileappdev.inclass10;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.Bundle;
 import android.util.Log;
 import android.widget.Toast;
 
 import com.google.gson.Gson;
 
 import java.io.IOException;
-import java.util.ArrayList;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -27,6 +28,12 @@ public class ChatHttpService {
 
     private final OkHttpClient client = new OkHttpClient();
     private Activity activity;
+    private ThreadList threadList;
+    private TokenResponse tokenResponse;
+
+    public static final String TOKEN_RESPONSE_BUNDLE_KEY = "tokenResponseBundleKey";
+    public static final String TOKEN_RESPONSE_INTENT_KEY = "tokenResponseIntentKey";
+    public static final String TOKEN_THREADS_BUNDLE_KEY = "threadBundleKey";
 
     public ChatHttpService(Activity activity) {
         this.activity = activity;
@@ -56,9 +63,7 @@ public class ChatHttpService {
             public void onResponse(Call call, Response response) throws IOException {
                 String responseBody = response.body().string();
                 Log.d("Http", "Register Response: " + responseBody);
-
-                Gson gson = new Gson();
-                TokenResponse tokenResponse = gson.fromJson(responseBody, TokenResponse.class);
+                parseUserForRegister(responseBody);
             }
         });
     }
@@ -84,7 +89,7 @@ public class ChatHttpService {
             public void onResponse(Call call, Response response) throws IOException {
                 String responseBody = response.body().string();
                 Log.d("Http", "Login Response: " + responseBody);
-                parseUser(responseBody);
+                parseUserForLogin(responseBody);
 
             }
         });
@@ -112,17 +117,19 @@ public class ChatHttpService {
             public void onResponse(Call call, Response response) throws IOException {
                 String responseBody = response.body().string();
                 Log.d("Http", "Response: " + responseBody);
+                parseThreadList(responseBody);
             }
         });
     }
 
-    protected void parseUser(String json){
+    protected void parseUserForLogin(String json){
         Gson gson = new Gson();
-        TokenResponse tokenResponse = gson.fromJson(json, TokenResponse.class);
+        tokenResponse = gson.fromJson(json, TokenResponse.class);
 
         if(!tokenResponse.getStatus().equals("error")){
             getThreadList(tokenResponse.getToken());
-            saveToken(tokenResponse.getToken());
+//            saveToken(tokenResponse.getToken());
+
         } else {
             activity.runOnUiThread(new Runnable() {
                 @Override
@@ -132,6 +139,51 @@ public class ChatHttpService {
                 }
             });
         }
+    }
+
+    protected void parseUserForRegister(String json){
+        Gson gson = new Gson();
+        tokenResponse = gson.fromJson(json, TokenResponse.class);
+
+        if(!tokenResponse.getStatus().equals("error")){
+            getThreadList(tokenResponse.getToken());
+            saveToken(tokenResponse.getToken());
+
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(activity, "Account Created", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+        } else {
+            activity.runOnUiThread(new Runnable() {
+                @Override
+                public void run() {
+                    Toast.makeText(activity, "UhOh! " + tokenResponse.getMessage(), Toast.LENGTH_SHORT).show();
+
+                }
+            });
+        }
+    }
+
+    protected void parseThreadList(String json){
+        Gson gson = new Gson();
+        threadList = gson.fromJson(json, ThreadList.class);
+
+        activity.runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+                Intent intent = new Intent(activity, MessageThreads.class);
+                Bundle bundle = new Bundle();
+                bundle.putSerializable(TOKEN_RESPONSE_BUNDLE_KEY, tokenResponse);
+                bundle.putSerializable(TOKEN_THREADS_BUNDLE_KEY, threadList);
+                intent.putExtra(TOKEN_RESPONSE_INTENT_KEY, bundle);
+                activity.startActivity(intent);
+            }
+        });
+
+        Log.d("Http","ThreadList size: " + threadList.getThreads().size());
     }
 
     protected void saveToken(String token) {

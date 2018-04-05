@@ -50,11 +50,10 @@ public class SignUp extends AppCompatActivity {
 
                 if(doPasswordsMatch(password.getText().toString(), passwordConfirm.getText().toString())) {
                     pass = password.getText().toString();
-
                     chatHttpService.performRegister(user, pass, fName, lName);
+
                 } else {
-                    Toast toast = Toast.makeText(SignUp.this, "Passwords do not match!", Toast.LENGTH_SHORT);
-                    toast.show();
+                    Toast.makeText(SignUp.this, "Passwords do not match!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
