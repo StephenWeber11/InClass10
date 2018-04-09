@@ -40,8 +40,26 @@
 
     <ListView
         android:id="@+id/threadListView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+        android:layout_width="wrap_content"
+        android:layout_height="325dp"
         android:layout_alignStart="@+id/currentThreadsHeading"
         android:layout_below="@+id/currentThreadsHeading" />
+
+    <EditText
+        android:id="@+id/inputTopic"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_alignStart="@+id/threadListView"
+        android:layout_marginBottom="19dp"
+        android:ems="10"
+        android:inputType="textPersonName" />
+
+    <ImageButton
+        android:id="@+id/imageButtonAdd"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignBottom="@+id/inputTopic"
+        android:layout_alignEnd="@+id/logoutButton"
+        app:srcCompat="@android:drawable/ic_input_add" />
 </RelativeLayout>

@@ -6,11 +6,14 @@ import android.content.SharedPreferences;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
@@ -22,6 +25,11 @@ public class MessageThreads extends AppCompatActivity {
     ImageButton logout;
     TokenResponse tokenResponse;
     ThreadList threadList;
+    ImageButton addButton;
+    EditText inputTopic;
+    MessageThreadsAdapter adapter;
+    ListView listView;
+    ChatHttpService chatHttpService;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -29,7 +37,11 @@ public class MessageThreads extends AppCompatActivity {
         setContentView(R.layout.activity_message_threads);
         setTitle("Message Threads");
 
+        chatHttpService = new ChatHttpService(this);
+
         userName = findViewById(R.id.UsernameMessage);
+        addButton = findViewById(R.id.imageButtonAdd);
+        inputTopic = findViewById(R.id.inputTopic);
 
         Intent intent = getIntent();
         Bundle bundle = intent.getBundleExtra(ChatHttpService.TOKEN_RESPONSE_INTENT_KEY);
@@ -38,16 +50,15 @@ public class MessageThreads extends AppCompatActivity {
 
         userName.setText(tokenResponse.getUser_fname());
 
-        ArrayList<String> truncatedThreadList = new ArrayList<>();
+        final ArrayList<Thread> truncatedThreadList = new ArrayList<>();
         for(int i = 0; i < 4; i++){
-            truncatedThreadList.add(threadList.getThreads().get(i).getTitle());
+            Thread threadToAdd = threadList.getThreads().get(i);
+            threadToAdd.setUserAdded(false);
+            truncatedThreadList.add(threadToAdd);
         }
 
-        ListView listView = (ListView)findViewById(R.id.threadListView);
-        ArrayAdapter<String> adapter =
-                new ArrayAdapter<String>(this, android.R.layout.simple_list_item_1,
-                        android.R.id.text1, truncatedThreadList);
-
+        listView = findViewById(R.id.threadListView);
+        adapter = new MessageThreadsAdapter(this, R.layout.activity_message_threads, truncatedThreadList, tokenResponse);
         listView.setAdapter(adapter);
 
         logout = findViewById(R.id.logoutButton);
@@ -59,6 +70,41 @@ public class MessageThreads extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+
+        addButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(inputTopic.getText().toString() != null && inputTopic.getText().toString() != "") {
+                    int size = threadList.getThreads().size();
+
+                    Thread thread = new Thread();
+                    thread.setUser_fname(tokenResponse.getUser_fname());
+                    thread.setUser_lname(tokenResponse.getUser_lname());
+                    thread.setUserAdded(true);
+                    thread.setTitle(inputTopic.getText().toString());
+                    thread.setUser_id(tokenResponse.getUser_email());
+                    thread.setId(threadList.getThreads().get(size-1).getId()+1);
+                    thread.setCreated_at("SomeDate");
+
+                    chatHttpService.addThread(thread, tokenResponse.getToken());
+
+                    truncatedThreadList.add(thread);
+
+                    adapter = new MessageThreadsAdapter(MessageThreads.this, R.layout.activity_message_threads, truncatedThreadList, tokenResponse);
+                    listView.setAdapter(adapter);
+                } else {
+                    Toast.makeText(MessageThreads.this, "Please enter a topic to continue!", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
+
     }
 
     protected void deleteToken() {
